@@ -24,12 +24,48 @@
         <MudItem xs="12" lg="6">
             <MudPaper Class="pa-4" Outlined="true">
                 <MudStack Spacing="2">
-                    <MudText Typo="Typo.h6">Replacement Target Preview</MudText>
+                    <MudText Typo="Typo.h6">Entity Action Preview</MudText>
                     <MudText Typo="Typo.body2">
-                        Add replacement components here before wiring them into Quasar extension targets.
+                        This renders like a Quasar entity row action target.
                     </MudText>
+                    <MudTable T="PreviewEntity" Items="@_entities" Dense="true" Hover="true">
+                        <HeaderContent>
+                            <MudTh>Type</MudTh>
+                            <MudTh>Entity ID</MudTh>
+                            <MudTh>Name</MudTh>
+                            <MudTh Class="preview-actions-column"><span class="preview-visually-hidden">Actions</span></MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Type">@context.Type</MudTd>
+                            <MudTd DataLabel="Entity ID" Class="mono">@context.EntityId</MudTd>
+                            <MudTd DataLabel="Name">@context.Name</MudTd>
+                            <MudTd DataLabel="" Class="preview-actions-column">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <TemplateEntityAction
+                                        AgentId="preview-agent"
+                                        ServerName="Preview Server"
+                                        EntityId="@context.EntityId"
+                                        EntityType="@context.Type"
+                                        EntitySubType="@context.SubType"
+                                        EntityDisplayName="@context.Name"
+                                        CanViewEntity="@context.CanView" />
+                                </MudStack>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
                 </MudStack>
             </MudPaper>
         </MudItem>
     </MudGrid>
 </MudStack>
+
+@code
+{
+    private readonly PreviewEntity[] _entities =
+    [
+        new(281474976710681, "Grid", "LargeShip", "Template Freighter", true),
+        new(281474976710682, "Character", "Player", "Engineer", false),
+    ];
+
+    private sealed record PreviewEntity(long EntityId, string Type, string SubType, string Name, bool CanView);
+}

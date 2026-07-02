@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
 using Quasar.Plugin.Abstractions;
+using Quasar.Plugin.Abstractions.Extensions;
+using Quasar.Plugin.Abstractions.Navigation;
+using Quasar.Plugin.Abstractions.Security;
 using TemplatePlugin.Components;
 using TemplatePlugin.Services;
 
@@ -43,8 +46,8 @@ public sealed class TemplateQuasarPlugin : IQuasarPlugin
     public IEnumerable<QuasarExtensionContribution> GetExtensions()
     {
         yield return new QuasarExtensionContribution(
-            "quasar.dashboard.panels",
-            typeof(TemplateDashboardPanel),
+            QuasarExtensionTargets.EntityActions,
+            typeof(TemplateEntityAction),
             QuasarPatchMode.After,
             800,
             Id,

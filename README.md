@@ -9,8 +9,11 @@ companion Magnetar plugins through Quasar.Agent.
 The template also includes a standalone preview host so replacement pages and
 components can be viewed quickly with Quasar-like MudBlazor theming.
 
-> Status: this template tracks the planned `Quasar.Plugin.Abstractions` API.
-> Update package versions and API names once that package lands in Quasar.
+The Quasar adapter uses a local sibling Quasar checkout when the default
+`QuasarPluginAbstractionsProject` path resolves from
+`src/TemplatePlugin.Quasar`, and falls back to the
+`Quasar.Plugin.Abstractions` package otherwise. Override the MSBuild property
+when Quasar lives elsewhere.
 
 ## Expected Layout
 
@@ -51,8 +54,8 @@ dotnet run --project samples/PreviewHost/PreviewHost.csproj
 ```
 
 The preview host references only the `TemplatePlugin` UI project and MudBlazor.
-It does not require `Quasar.Plugin.Abstractions`, so it can run before the Quasar
-plugin loader exists.
+It does not require `Quasar.Plugin.Abstractions`, so component/page design stays
+fast even when Quasar itself is not running.
 
 Use the preview host to check:
 
@@ -120,7 +123,7 @@ unless the plugin has a specific technical reason and the review calls it out.
 - `TemplatePlugin.Quasar`
   - Thin adapter implementing `IQuasarPlugin`.
   - Registers nav items, routes, extension points, endpoints, and services.
-  - References planned `Quasar.Plugin.Abstractions`.
+  - References `Quasar.Plugin.Abstractions`.
 
 Keep most code in the UI project. Keep Quasar-specific code in the adapter.
 
@@ -185,18 +188,33 @@ public sealed class TemplateQuasarPlugin : IQuasarPlugin
             800,
             QuasarPolicyNames.CanView);
     }
+
+    public IEnumerable<QuasarExtensionContribution> GetExtensions()
+    {
+        yield return new QuasarExtensionContribution(
+            QuasarExtensionTargets.EntityActions,
+            typeof(TemplateEntityAction),
+            QuasarPatchMode.After,
+            800,
+            Id,
+            QuasarPolicyNames.CanView);
+    }
 }
 ```
 
 ## Extension Points
 
-Quasar plugins can contribute to stable extension targets:
+Quasar plugins can contribute to stable extension targets. Currently hosted in
+Quasar:
+
+- `quasar.component.entity-actions`
+- `quasar.page.entities`
+
+Planned targets:
 
 - `quasar.dashboard.panels`
-- `quasar.component.entity-actions`
 - `quasar.component.entity-details-tabs`
 - `quasar.component.server-detail-actions`
-- `quasar.page.entities`
 - `quasar.page.plugins`
 - `quasar.page.analytics`
 
