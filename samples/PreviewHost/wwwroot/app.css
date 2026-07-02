@@ -1,0 +1,14 @@
+html,
+body {
+    min-height: 100%;
+    margin: 0;
+    font-family: Roboto, Arial, sans-serif;
+}
+
+.preview-content {
+    padding: 24px;
+}
+
+#blazor-error-ui {
+    display: none;
+}

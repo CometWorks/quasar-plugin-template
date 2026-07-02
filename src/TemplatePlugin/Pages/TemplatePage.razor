@@ -1,0 +1,70 @@
+@page "/template-plugin"
+@implements IDisposable
+@inject TemplatePluginState PluginState
+
+<PageTitle>Template Plugin</PageTitle>
+
+<MudStack Spacing="3">
+    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+        <MudText Typo="Typo.h4">Template Plugin</MudText>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Refresh"
+                   OnClick="Refresh">
+            Refresh
+        </MudButton>
+    </MudStack>
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        Replace this page with the plugin's primary Quasar experience.
+    </MudAlert>
+
+    <MudGrid>
+        <MudItem xs="12" md="8">
+            <MudPaper Class="pa-4" Outlined="true">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">Main Panel</MudText>
+                    <MudText Typo="Typo.body2">
+                        Use MudBlazor controls for ordinary UI and keep custom HTML isolated to specialized visual surfaces.
+                    </MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudPaper Class="pa-4" Outlined="true">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">Status</MudText>
+                    <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">Ready</MudChip>
+                    <MudText Typo="Typo.body2">
+                        State created @PluginState.CreatedAtUtc.ToLocalTime().ToString("u")
+                    </MudText>
+                    <MudText Typo="Typo.body2">
+                        Refresh count: @PluginState.RefreshCount
+                    </MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>
+
+@code {
+    protected override void OnInitialized()
+    {
+        PluginState.Changed += OnPluginStateChanged;
+    }
+
+    public void Dispose()
+    {
+        PluginState.Changed -= OnPluginStateChanged;
+    }
+
+    private void Refresh()
+    {
+        PluginState.Refresh();
+    }
+
+    private void OnPluginStateChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+}

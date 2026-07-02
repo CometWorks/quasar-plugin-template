@@ -1,0 +1,4 @@
+.template-plugin-surface {
+    color: var(--mud-palette-text-primary);
+    background: var(--mud-palette-surface);
+}

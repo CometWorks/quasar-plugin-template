@@ -1,0 +1,35 @@
+@page "/"
+
+<PageTitle>Quasar Plugin Preview</PageTitle>
+
+<MudStack Spacing="3">
+    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+        <MudText Typo="Typo.h4">Plugin Preview</MudText>
+        <MudButton Href="/template-plugin"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.OpenInNew">
+            Open Page
+        </MudButton>
+    </MudStack>
+
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
+        This host renders plugin pages and replacement components with Quasar-like MudBlazor theming.
+    </MudAlert>
+
+    <MudGrid>
+        <MudItem xs="12" lg="6">
+            <TemplateDashboardPanel />
+        </MudItem>
+        <MudItem xs="12" lg="6">
+            <MudPaper Class="pa-4" Outlined="true">
+                <MudStack Spacing="2">
+                    <MudText Typo="Typo.h6">Replacement Target Preview</MudText>
+                    <MudText Typo="Typo.body2">
+                        Add replacement components here before wiring them into Quasar extension targets.
+                    </MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudStack>
