@@ -6,6 +6,9 @@
   "entryType": "TemplatePlugin.Quasar.TemplateQuasarPlugin",
   "projectPath": "src/TemplatePlugin.Quasar/TemplatePlugin.Quasar.csproj",
   "staticAssets": "src/TemplatePlugin/wwwroot",
+  "stylesheets": [
+    "template-plugin.css"
+  ],
   "quasarVersion": ">=0.1.0",
   "companionPlugins": []
 }

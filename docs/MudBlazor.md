@@ -44,6 +44,17 @@ Keep surrounding controls in MudBlazor and use Quasar/MudBlazor CSS variables:
 }
 ```
 
+Declare small plugin-wide stylesheets in `quasar-plugin.json`:
+
+```json
+"stylesheets": [
+  "template-plugin.css"
+]
+```
+
+Quasar resolves these paths relative to `staticAssets` and injects them after
+Quasar core CSS. Prefer narrow selectors and MudBlazor CSS variables.
+
 ## Review Rule
 
 If a plugin avoids MudBlazor for ordinary UI, document why in the QuasarHub pull

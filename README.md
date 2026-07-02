@@ -107,10 +107,17 @@ unless the plugin has a specific technical reason and the review calls it out.
   "entryType": "TemplatePlugin.Quasar.TemplateQuasarPlugin",
   "projectPath": "src/TemplatePlugin.Quasar/TemplatePlugin.Quasar.csproj",
   "staticAssets": "src/TemplatePlugin/wwwroot",
+  "stylesheets": [
+    "template-plugin.css"
+  ],
   "quasarVersion": ">=0.1.0",
   "companionPlugins": []
 }
 ```
+
+`stylesheets` entries are resolved relative to `staticAssets` and injected into
+Quasar's host page after Quasar core CSS. Keep plugin CSS scoped by class names
+or component selectors so it does not disturb unrelated Quasar pages.
 
 `quasar-hub.xml` is the catalog descriptor copied into
 `CometWorks/quasar-hub/Plugins/` when publishing.
