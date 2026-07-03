@@ -9,11 +9,13 @@ companion Magnetar plugins through Quasar.Agent.
 The template also includes a standalone preview host so replacement pages and
 components can be viewed quickly with Quasar-like MudBlazor theming.
 
-The Quasar adapter uses a local sibling Quasar checkout when the default
-`QuasarPluginAbstractionsProject` path resolves from
-`src/TemplatePlugin.Quasar`, and falls back to the
-`Quasar.Plugin.Abstractions` package otherwise. Override the MSBuild property
-when Quasar lives elsewhere.
+The Quasar adapter accepts `QuasarPluginAbstractionsAssembly` when built by the
+QuasarHub installer, so it compiles against the exact
+`Quasar.Plugin.Abstractions.dll` loaded by the running Quasar worker. For local
+development it uses a sibling Quasar checkout when the default
+`QuasarPluginAbstractionsProject` path resolves from `src/TemplatePlugin.Quasar`,
+and falls back to the `Quasar.Plugin.Abstractions` package otherwise. Override
+the MSBuild properties when Quasar lives elsewhere.
 
 ## Expected Layout
 
