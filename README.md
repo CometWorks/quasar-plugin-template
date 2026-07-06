@@ -112,7 +112,7 @@ unless the plugin has a specific technical reason and the review calls it out.
   "stylesheets": [
     "template-plugin.css"
   ],
-  "quasarVersion": ">=0.1.0",
+  "quasarVersion": ">=1.1.0",
   "companionPlugins": []
 }
 ```
@@ -163,6 +163,14 @@ Use this pattern for:
 
 Avoid replacing Quasar core services unless Quasar exposes an explicit extension
 target for that service.
+
+Use `context.InstallDirectory` when the adapter needs Quasar-owned persistent
+files, for example under `ManagedRuntime/Tools/<plugin-id>`. Do not read
+`QUASAR_INSTALL_DIR` directly in plugin code; Quasar has already resolved the
+environment variable, `QUASAR_INSTALL_DIR_FILE`, and development
+`.quasar-install-dir` overrides before it builds the plugin context.
+`context.PluginDirectory` is the package manifest directory, and
+`context.CacheDirectory` is the shadow-copy load directory.
 
 ## Plugin Entry Point
 

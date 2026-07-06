@@ -19,6 +19,7 @@ public sealed class TemplateQuasarPlugin : IQuasarPlugin
 
     public void ConfigureServices(IServiceCollection services, QuasarPluginContext context)
     {
+        // Use context.InstallDirectory for Quasar-owned persistent files.
         services.AddTemplatePluginUi();
     }
 

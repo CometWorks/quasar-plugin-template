@@ -9,6 +9,6 @@
     <PluginKind>QuasarUiPlugin</PluginKind>
     <ProjectPath>src/TemplatePlugin.Quasar/TemplatePlugin.Quasar.csproj</ProjectPath>
     <PackageManifest>quasar-plugin.json</PackageManifest>
-    <QuasarVersion>&gt;=0.1.0</QuasarVersion>
+    <QuasarVersion>&gt;=1.1.0</QuasarVersion>
     <Commit>TODO Git commit hash</Commit>
 </PluginData>
