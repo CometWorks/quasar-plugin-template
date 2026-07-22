@@ -10,5 +10,11 @@
     "template-plugin.css"
   ],
   "quasarVersion": ">=1.1.0",
-  "companionPlugins": []
+  "companionPlugins": [
+    {
+      "id": "todo.template-plugin",
+      "projectPath": "src/TemplatePlugin.Magnetar/TemplatePlugin.Magnetar.csproj",
+      "entryAssembly": "TemplatePlugin.Magnetar.dll"
+    }
+  ]
 }

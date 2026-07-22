@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>TemplatePlugin.Magnetar</AssemblyName>
+    <RootNamespace>TemplatePlugin.Magnetar</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <OutputType>Library</OutputType>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <MagnetarProtocolProject Condition="'$(MagnetarProtocolProject)' == ''">../../../Quasar/Magnetar.Protocol/Magnetar.Protocol.csproj</MagnetarProtocolProject>
+
+    <!-- Quasar supplies DS64 when building an owned companion. These defaults
+         keep direct local builds working without overriding Quasar's value. -->
+    <DS64 Condition="'$(DS64)' == '' AND $([MSBuild]::IsOSPlatform('Windows'))">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 298740@InstallLocation)\DedicatedServer64</DS64>
+    <DS64 Condition="'$(DS64)' == '\DedicatedServer64'">C:\Program Files (x86)\Steam\steamapps\common\SpaceEngineersDedicatedServer\DedicatedServer64</DS64>
+    <DS64 Condition="'$(DS64)' == '' AND !$([MSBuild]::IsOSPlatform('Windows')) AND Exists('$(HOME)/.local/share/Steam/steamapps/common/SpaceEngineersDedicatedServer/DedicatedServer64/Sandbox.Game.dll')">$(HOME)/.local/share/Steam/steamapps/common/SpaceEngineersDedicatedServer/DedicatedServer64</DS64>
+    <DS64 Condition="'$(DS64)' == '' AND !$([MSBuild]::IsOSPlatform('Windows'))">$(HOME)/.steam/steam/steamapps/common/SpaceEngineersDedicatedServer/DedicatedServer64</DS64>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Sandbox.Game" HintPath="$(DS64)\Sandbox.Game.dll" Private="False" />
+    <Reference Include="VRage" HintPath="$(DS64)\VRage.dll" Private="False" />
+    <Reference Include="VRage.Game" HintPath="$(DS64)\VRage.Game.dll" Private="False" />
+    <Reference Include="VRage.Library" HintPath="$(DS64)\VRage.Library.dll" Private="False" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(MagnetarProtocolAssembly)' != '' And Exists('$(MagnetarProtocolAssembly)')">
+    <Reference Include="Magnetar.Protocol" HintPath="$(MagnetarProtocolAssembly)" Private="False" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(MagnetarProtocolAssembly)' == '' And Exists('$(MagnetarProtocolProject)')">
+    <ProjectReference Include="$(MagnetarProtocolProject)" Private="False" />
+  </ItemGroup>
+
+  <Target Name="ValidateDedicatedServerReferences" BeforeTargets="ResolveAssemblyReferences" Condition="!Exists('$(DS64)\Sandbox.Game.dll')">
+    <Error Text="Dedicated Server assemblies were not found under DS64='$(DS64)'. Set DS64 to the DedicatedServer64 directory." />
+  </Target>
+
+</Project>

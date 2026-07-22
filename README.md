@@ -33,9 +33,12 @@ the MSBuild properties when Quasar lives elsewhere.
 |   |   |   `-- TemplateDashboardPanel.razor
 |   |   `-- wwwroot/
 |   |       `-- template-plugin.css
-|   `-- TemplatePlugin.Quasar/
-|       |-- TemplatePlugin.Quasar.csproj
-|       `-- TemplateQuasarPlugin.cs
+|   |-- TemplatePlugin.Quasar/
+|   |   |-- TemplatePlugin.Quasar.csproj
+|   |   `-- TemplateQuasarPlugin.cs
+|   `-- TemplatePlugin.Magnetar/
+|       |-- TemplatePlugin.Magnetar.csproj
+|       `-- TemplateCompanionPlugin.cs
 |-- samples/
 |   `-- PreviewHost/
 |       |-- PreviewHost.csproj
@@ -113,13 +116,27 @@ unless the plugin has a specific technical reason and the review calls it out.
     "template-plugin.css"
   ],
   "quasarVersion": ">=1.1.0",
-  "companionPlugins": []
+  "companionPlugins": [
+    {
+      "id": "todo.template-plugin",
+      "projectPath": "src/TemplatePlugin.Magnetar/TemplatePlugin.Magnetar.csproj",
+      "entryAssembly": "TemplatePlugin.Magnetar.dll"
+    }
+  ]
 }
 ```
 
 `stylesheets` entries are resolved relative to `staticAssets` and injected into
 Quasar's host page after Quasar core CSS. Keep plugin CSS scoped by class names
 or component selectors so it does not disturb unrelated Quasar pages.
+
+An owned Magnetar companion is declared as an object with `id`, `projectPath`,
+and optional `entryAssembly` fields instead of a string id. During installation,
+Quasar builds that project with `MagnetarProtocolAssembly` and a resolved `DS64`
+directory. Companion projects should consume `$(DS64)` for Dedicated Server
+assembly references and only define platform-specific fallbacks when the
+property is empty, so local builds still work without overriding Quasar's path.
+See [Companion Channel](docs/CompanionChannel.md) for an example.
 
 `quasar-hub.xml` is the catalog descriptor copied into
 `CometWorks/quasar-hub/Plugins/` when publishing.
@@ -133,8 +150,13 @@ or component selectors so it does not disturb unrelated Quasar pages.
   - Thin adapter implementing `IQuasarPlugin`.
   - Registers nav items, routes, extension points, endpoints, and services.
   - References `Quasar.Plugin.Abstractions`.
+- `TemplatePlugin.Magnetar`
+  - Owned server companion loaded by Magnetar.
+  - Handles Quasar companion-channel requests through `Magnetar.Protocol`.
+  - References Space Engineers server assemblies through `$(DS64)`.
 
-Keep most code in the UI project. Keep Quasar-specific code in the adapter.
+Keep most UI code in the UI project. Keep Quasar-specific code in the adapter
+and server-only code in the Magnetar companion.
 
 ## Dependency Injection and State
 
