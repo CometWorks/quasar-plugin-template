@@ -20,6 +20,14 @@
     <DS64 Condition="'$(DS64)' == '\DedicatedServer64'">C:\Program Files (x86)\Steam\steamapps\common\SpaceEngineersDedicatedServer\DedicatedServer64</DS64>
     <DS64 Condition="'$(DS64)' == '' AND !$([MSBuild]::IsOSPlatform('Windows')) AND Exists('$(HOME)/.local/share/Steam/steamapps/common/SpaceEngineersDedicatedServer/DedicatedServer64/Sandbox.Game.dll')">$(HOME)/.local/share/Steam/steamapps/common/SpaceEngineersDedicatedServer/DedicatedServer64</DS64>
     <DS64 Condition="'$(DS64)' == '' AND !$([MSBuild]::IsOSPlatform('Windows'))">$(HOME)/.steam/steam/steamapps/common/SpaceEngineersDedicatedServer/DedicatedServer64</DS64>
+
+    <!-- Magnetar points at the install root containing PluginSdk.dll. As with
+         DS64, Quasar may supply Magnetar/MagnetarBin; these defaults keep direct
+         local builds working without overriding an externally provided value. -->
+    <Magnetar Condition="'$(Magnetar)' == '' AND $([MSBuild]::IsOSPlatform('Windows'))">$(APPDATA)\Magnetar</Magnetar>
+    <Magnetar Condition="'$(Magnetar)' == '' AND !$([MSBuild]::IsOSPlatform('Windows'))">$(HOME)/.local/share/Magnetar</Magnetar>
+    <MagnetarBin Condition="'$(MagnetarBin)' == '' AND '$(Magnetar)' != '' AND $([MSBuild]::IsOSPlatform('Windows'))">$(Magnetar)\Libraries\MagnetarLegacy</MagnetarBin>
+    <MagnetarBin Condition="'$(MagnetarBin)' == '' AND '$(Magnetar)' != '' AND !$([MSBuild]::IsOSPlatform('Windows'))">$(Magnetar)/Bin</MagnetarBin>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +35,7 @@
     <Reference Include="VRage" HintPath="$(DS64)\VRage.dll" Private="False" />
     <Reference Include="VRage.Game" HintPath="$(DS64)\VRage.Game.dll" Private="False" />
     <Reference Include="VRage.Library" HintPath="$(DS64)\VRage.Library.dll" Private="False" />
+    <Reference Include="PluginSdk" HintPath="$(MagnetarBin)\PluginSdk.dll" Private="False" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(MagnetarProtocolAssembly)' != '' And Exists('$(MagnetarProtocolAssembly)')">
@@ -39,6 +48,10 @@
 
   <Target Name="ValidateDedicatedServerReferences" BeforeTargets="ResolveAssemblyReferences" Condition="!Exists('$(DS64)\Sandbox.Game.dll')">
     <Error Text="Dedicated Server assemblies were not found under DS64='$(DS64)'. Set DS64 to the DedicatedServer64 directory." />
+  </Target>
+
+  <Target Name="ValidateMagnetarReferences" BeforeTargets="ResolveAssemblyReferences" Condition="!Exists('$(MagnetarBin)\PluginSdk.dll')">
+    <Error Text="Magnetar PluginSdk.dll was not found under MagnetarBin='$(MagnetarBin)'. Set Magnetar to the Magnetar install directory, or MagnetarBin directly to the directory containing PluginSdk.dll." />
   </Target>
 
 </Project>

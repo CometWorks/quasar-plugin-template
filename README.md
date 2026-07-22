@@ -132,11 +132,12 @@ or component selectors so it does not disturb unrelated Quasar pages.
 
 An owned Magnetar companion is declared as an object with `id`, `projectPath`,
 and optional `entryAssembly` fields instead of a string id. During installation,
-Quasar builds that project with `MagnetarProtocolAssembly` and a resolved `DS64`
-directory. Companion projects should consume `$(DS64)` for Dedicated Server
-assembly references and only define platform-specific fallbacks when the
-property is empty, so local builds still work without overriding Quasar's path.
-See [Companion Channel](docs/CompanionChannel.md) for an example.
+Quasar builds that project with `MagnetarProtocolAssembly`, a resolved `DS64`
+directory, and a `Magnetar` directory. Companion projects should consume
+`$(DS64)` for Dedicated Server assembly references and `$(MagnetarBin)` for
+Magnetar's `PluginSdk`, and only define platform-specific fallbacks when those
+properties are empty, so local builds still work without overriding Quasar's
+paths. See [Companion Channel](docs/CompanionChannel.md) for an example.
 
 `quasar-hub.xml` is the catalog descriptor copied into
 `CometWorks/quasar-hub/Plugins/` when publishing.
@@ -153,7 +154,8 @@ See [Companion Channel](docs/CompanionChannel.md) for an example.
 - `TemplatePlugin.Magnetar`
   - Owned server companion loaded by Magnetar.
   - Handles Quasar companion-channel requests through `Magnetar.Protocol`.
-  - References Space Engineers server assemblies through `$(DS64)`.
+  - References Space Engineers server assemblies through `$(DS64)` and
+    Magnetar's `PluginSdk` through `$(MagnetarBin)`.
 
 Keep most UI code in the UI project. Keep Quasar-specific code in the adapter
 and server-only code in the Magnetar companion.

@@ -16,7 +16,8 @@ the request to the named companion plugin.
 The template includes `src/TemplatePlugin.Magnetar`, a minimal companion that
 implements `IQuasarCompanionRequestHandler`. It exposes a `runtime.info`
 operation and references `MySession` through the Dedicated Server assemblies,
-demonstrating both the request contract and `DS64` usage.
+demonstrating both the request contract and `DS64` usage. It also references
+Magnetar's `PluginSdk` through `$(MagnetarBin)`.
 
 It is declared as an owned companion in `quasar-plugin.json`:
 
@@ -30,16 +31,18 @@ It is declared as an owned companion in `quasar-plugin.json`:
 ]
 ```
 
-Quasar builds owned companions with two host-resolved MSBuild properties:
+Quasar builds owned companions with host-resolved MSBuild properties:
 
 - `MagnetarProtocolAssembly` points to the protocol assembly used by
   Quasar.Agent.
 - `DS64` points to a valid Dedicated Server assembly directory resolved by
   Quasar, preferring its configured or managed runtime.
+- `Magnetar` points to the Magnetar install root; `MagnetarBin` is derived from
+  it and locates `PluginSdk.dll`.
 
-Reference Space Engineers assemblies through `$(DS64)` in the companion
-project. Keep local-development defaults conditional so Quasar's command-line
-value wins:
+Reference Space Engineers assemblies through `$(DS64)` and Magnetar's SDK
+through `$(MagnetarBin)` in the companion project. Keep local-development
+defaults conditional so Quasar's command-line values win:
 
 ```xml
 <PropertyGroup>
@@ -47,16 +50,22 @@ value wins:
   <DS64 Condition="'$(DS64)' == '\DedicatedServer64'">C:\Program Files (x86)\Steam\steamapps\common\SpaceEngineersDedicatedServer\DedicatedServer64</DS64>
   <DS64 Condition="'$(DS64)' == '' AND !$([MSBuild]::IsOSPlatform('Windows')) AND Exists('$(HOME)/.local/share/Steam/steamapps/common/SpaceEngineersDedicatedServer/DedicatedServer64/Sandbox.Game.dll')">$(HOME)/.local/share/Steam/steamapps/common/SpaceEngineersDedicatedServer/DedicatedServer64</DS64>
   <DS64 Condition="'$(DS64)' == '' AND !$([MSBuild]::IsOSPlatform('Windows'))">$(HOME)/.steam/steam/steamapps/common/SpaceEngineersDedicatedServer/DedicatedServer64</DS64>
+
+  <Magnetar Condition="'$(Magnetar)' == '' AND $([MSBuild]::IsOSPlatform('Windows'))">$(APPDATA)\Magnetar</Magnetar>
+  <Magnetar Condition="'$(Magnetar)' == '' AND !$([MSBuild]::IsOSPlatform('Windows'))">$(HOME)/.local/share/Magnetar</Magnetar>
+  <MagnetarBin Condition="'$(MagnetarBin)' == '' AND '$(Magnetar)' != '' AND $([MSBuild]::IsOSPlatform('Windows'))">$(Magnetar)\Libraries\MagnetarLegacy</MagnetarBin>
+  <MagnetarBin Condition="'$(MagnetarBin)' == '' AND '$(Magnetar)' != '' AND !$([MSBuild]::IsOSPlatform('Windows'))">$(Magnetar)/Bin</MagnetarBin>
 </PropertyGroup>
 
 <ItemGroup>
   <Reference Include="Sandbox.Game" HintPath="$(DS64)\Sandbox.Game.dll" Private="False" />
   <Reference Include="VRage" HintPath="$(DS64)\VRage.dll" Private="False" />
+  <Reference Include="PluginSdk" HintPath="$(MagnetarBin)\PluginSdk.dll" Private="False" />
 </ItemGroup>
 ```
 
-If Quasar cannot resolve a valid DS64 directory, it omits the property and these
-local defaults remain active.
+If Quasar cannot resolve a valid DS64 or Magnetar directory, it omits the
+property and these local defaults remain active.
 
 ## Request Shape
 
