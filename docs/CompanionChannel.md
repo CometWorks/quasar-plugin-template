@@ -30,16 +30,23 @@ It is declared as an owned companion in `quasar-plugin.json`:
 ]
 ```
 
-Quasar builds owned companions with two host-resolved MSBuild properties:
+Quasar builds owned companions with these host-resolved MSBuild properties:
 
 - `MagnetarProtocolAssembly` points to the protocol assembly used by
   Quasar.Agent.
 - `DS64` points to a valid Dedicated Server assembly directory resolved by
   Quasar, preferring its configured or managed runtime.
+- `Magnetar` points to the managed Magnetar install root when its
+  `PluginSdk.dll` is present.
 
-Reference Space Engineers assemblies through `$(DS64)` in the companion
-project. Keep local-development defaults conditional so Quasar's command-line
-value wins:
+The template companion references Space Engineers assemblies through `$(DS64)`
+and the host-provided `PluginSdk.dll` through `$(Magnetar)`. It resolves the
+current Linux SDK under `Libraries/MagnetarInterim`, the older Linux SDK under
+`Bin`, and the Windows SDK under `Libraries/MagnetarLegacy`. Its local-development
+defaults are conditional so Quasar's command-line values win. Set `Magnetar` and
+`DS64` explicitly when building against other installations.
+
+For example, the Dedicated Server references use this pattern:
 
 ```xml
 <PropertyGroup>
@@ -55,8 +62,8 @@ value wins:
 </ItemGroup>
 ```
 
-If Quasar cannot resolve a valid DS64 directory, it omits the property and these
-local defaults remain active.
+If Quasar cannot resolve a managed `DS64` or `Magnetar` directory, it omits that
+property and the local defaults remain active.
 
 ## Request Shape
 
