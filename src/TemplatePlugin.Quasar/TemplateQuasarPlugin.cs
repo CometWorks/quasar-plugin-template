@@ -1,7 +1,6 @@
 using System.Reflection;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using MudBlazor;
 using Quasar.Plugin.Abstractions;
 using Quasar.Plugin.Abstractions.Extensions;
 using Quasar.Plugin.Abstractions.Navigation;
@@ -38,7 +37,7 @@ public sealed class TemplateQuasarPlugin : IQuasarPlugin
         yield return new QuasarNavItem(
             "Template",
             "/template-plugin",
-            Icons.Material.Filled.Extension,
+            TemplateIcons.Extension,
             QuasarNavZones.Main,
             800,
             QuasarPolicyNames.CanView);

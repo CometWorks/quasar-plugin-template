@@ -3,68 +3,18 @@
 @inject TemplatePluginState PluginState
 
 <PageTitle>Template Plugin</PageTitle>
-
-<MudStack Spacing="3">
-    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-        <MudText Typo="Typo.h4">Template Plugin</MudText>
-        <MudButton Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   StartIcon="@Icons.Material.Filled.Refresh"
-                   OnClick="Refresh">
-            Refresh
-        </MudButton>
-    </MudStack>
-
-    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">
-        Replace this page with the plugin's primary Quasar experience.
-    </MudAlert>
-
-    <MudGrid>
-        <MudItem xs="12" md="8">
-            <MudPaper Class="pa-4" Outlined="true">
-                <MudStack Spacing="2">
-                    <MudText Typo="Typo.h6">Main Panel</MudText>
-                    <MudText Typo="Typo.body2">
-                        Use MudBlazor controls for ordinary UI and keep custom HTML isolated to specialized visual surfaces.
-                    </MudText>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12" md="4">
-            <MudPaper Class="pa-4" Outlined="true">
-                <MudStack Spacing="2">
-                    <MudText Typo="Typo.h6">Status</MudText>
-                    <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">Ready</MudChip>
-                    <MudText Typo="Typo.body2">
-                        State created @PluginState.CreatedAtUtc.ToLocalTime().ToString("u")
-                    </MudText>
-                    <MudText Typo="Typo.body2">
-                        Refresh count: @PluginState.RefreshCount
-                    </MudText>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
-</MudStack>
+<div class="template-plugin-surface">
+    <header class="template-row"><h1>Template Plugin</h1><button type="button" class="template-button" @onclick="Refresh"><TemplateIcon Icon="@TemplateIcons.Refresh" />Refresh</button></header>
+    <p class="template-notice">Replace this page with the plugin's primary Quasar experience.</p>
+    <div class="template-grid">
+        <section class="template-panel"><h2>Main Panel</h2><p>Use semantic HTML controls and Quasar theme tokens for plugin UI.</p></section>
+        <section class="template-panel"><h2>Status</h2><span class="template-status">Ready</span><p>State created @PluginState.CreatedAtUtc.ToLocalTime().ToString("u")</p><p>Refresh count: @PluginState.RefreshCount</p></section>
+    </div>
+</div>
 
 @code {
-    protected override void OnInitialized()
-    {
-        PluginState.Changed += OnPluginStateChanged;
-    }
-
-    public void Dispose()
-    {
-        PluginState.Changed -= OnPluginStateChanged;
-    }
-
-    private void Refresh()
-    {
-        PluginState.Refresh();
-    }
-
-    private void OnPluginStateChanged()
-    {
-        _ = InvokeAsync(StateHasChanged);
-    }
+    protected override void OnInitialized() => PluginState.Changed += OnPluginStateChanged;
+    public void Dispose() => PluginState.Changed -= OnPluginStateChanged;
+    private void Refresh() => PluginState.Refresh();
+    private void OnPluginStateChanged() => _ = InvokeAsync(StateHasChanged);
 }

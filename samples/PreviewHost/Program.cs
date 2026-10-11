@@ -1,4 +1,3 @@
-using MudBlazor.Services;
 using PreviewHost.Components;
 using TemplatePlugin.Pages;
 using TemplatePlugin.Services;
@@ -7,7 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-builder.Services.AddMudServices();
 builder.Services.AddTemplatePluginUi();
 
 var app = builder.Build();

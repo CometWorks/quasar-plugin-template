@@ -1,15 +1,12 @@
-@inject ISnackbar Snackbar
-
-<MudTooltip Text="@TooltipText">
-    <MudIconButton Icon="@Icons.Material.Filled.Extension"
-                   Color="Color.Secondary"
-                   Size="Size.Small"
-                   Disabled="@(!CanViewEntity)"
-                   OnClick="HandleClick" />
-</MudTooltip>
+<span class="template-plugin-surface">
+    <button type="button" class="template-icon-button" title="@TooltipText" aria-label="@TooltipText" disabled="@(!CanViewEntity)" @onclick="HandleClick"><TemplateIcon Icon="@TemplateIcons.Extension" /></button>
+    @if (!string.IsNullOrWhiteSpace(_notice)) { <span class="template-action-notice" role="status">@_notice</span> }
+</span>
 
 @code
 {
+    private string _notice = string.Empty;
+
     [Parameter]
     public string? AgentId { get; set; }
 
@@ -40,6 +37,7 @@
 
     private void HandleClick()
     {
+        if (!CanViewEntity) return;
         var name = string.IsNullOrWhiteSpace(EntityDisplayName)
             ? $"Entity {EntityId}"
             : EntityDisplayName;
@@ -47,6 +45,6 @@
             ? AgentId ?? "unknown server"
             : ServerName;
 
-        Snackbar.Add($"{name} on {server}: replace this action with plugin logic.", Severity.Info);
+        _notice = $"{name} on {server}: replace this action with plugin logic.";
     }
 }

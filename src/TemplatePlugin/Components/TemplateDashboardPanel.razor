@@ -1,22 +1,15 @@
+@implements IDisposable
 @inject TemplatePluginState PluginState
 
-<MudPaper Class="pa-4" Outlined="true">
-    <MudStack Spacing="2">
-        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
-            <MudText Typo="Typo.h6">Template Plugin</MudText>
-            <MudIcon Icon="@Icons.Material.Filled.Extension" Color="Color.Primary" />
-        </MudStack>
-        <MudText Typo="Typo.body2">
-            Dashboard contribution placeholder.
-        </MudText>
-        <MudChip T="string" Variant="Variant.Outlined" Color="Color.Info">
-            Refreshes: @PluginState.RefreshCount
-        </MudChip>
-        <MudButton Href="/template-plugin"
-                   Variant="Variant.Outlined"
-                   Color="Color.Primary"
-                   StartIcon="@Icons.Material.Filled.OpenInNew">
-            Open
-        </MudButton>
-    </MudStack>
-</MudPaper>
+<section class="template-plugin-surface template-panel">
+    <div class="template-row"><h2>Template Plugin</h2><TemplateIcon Icon="@TemplateIcons.Extension" /></div>
+    <p>Dashboard contribution placeholder.</p>
+    <p class="template-status">Refreshes: @PluginState.RefreshCount</p>
+    <a class="template-button" href="/template-plugin"><TemplateIcon Icon="@TemplateIcons.OpenInNew" />Open</a>
+</section>
+
+@code {
+    protected override void OnInitialized() => PluginState.Changed += Changed;
+    private void Changed() => _ = InvokeAsync(StateHasChanged);
+    public void Dispose() => PluginState.Changed -= Changed;
+}
