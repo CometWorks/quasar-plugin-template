@@ -7,7 +7,7 @@ routes, nav items, extension components, static assets, and generic requests to
 companion Magnetar plugins through Quasar.Agent.
 
 The template also includes a standalone preview host so replacement pages and
-components can be viewed quickly with Quasar-like MudBlazor theming.
+components can be viewed quickly with Quasar appearance tokens.
 
 The Quasar adapter accepts `QuasarPluginAbstractionsAssembly` when built by the
 QuasarHub installer, so it compiles against the exact
@@ -47,7 +47,7 @@ the MSBuild properties when Quasar lives elsewhere.
 |       `-- wwwroot/
 `-- docs/
     |-- CompanionChannel.md
-    `-- MudBlazor.md
+    `-- NativeUi.md
 ```
 
 ## Preview Workflow
@@ -58,7 +58,7 @@ Run the standalone preview host while building plugin UI:
 dotnet run --project samples/PreviewHost/PreviewHost.csproj
 ```
 
-The preview host references only the `TemplatePlugin` UI project and MudBlazor.
+The preview host references only the `TemplatePlugin` UI project and the ASP.NET Core framework.
 It does not require `Quasar.Plugin.Abstractions`, so component/page design stays
 fast even when Quasar itself is not running.
 
@@ -68,36 +68,22 @@ Use the preview host to check:
 - dashboard panels
 - entity/server action components
 - plugin singleton/scoped state
-- light and dark MudBlazor theme behavior
+- light and dark appearance behavior
 - responsive layout
 
 The Quasar adapter lives in `src/TemplatePlugin.Quasar`. It is intentionally thin
 and should only translate UI components into Quasar plugin contributions.
 
-## MudBlazor First
+## Native UI
 
-Use MudBlazor for ordinary UI. This is not just a preference; it keeps Quasar
-plugins visually coherent with Quasar core.
+Use semantic HTML controls, Blazor bindings, and scoped CSS with Quasar's
+`--quasar-palette-*` appearance tokens. The template, adapter, and preview host
+have no MudBlazor dependency. Existing Material icons are retained as SVG paths.
+See [Native Quasar UI](docs/NativeUi.md) for forms, dialogs, validation,
+accessibility, theme inheritance, and installed asset paths.
 
-Use MudBlazor for:
-
-- nav links
-- buttons and icon buttons
-- forms
-- dialogs
-- tabs
-- tables/data grids
-- menus
-- cards/papers
-- alerts
-- progress/loading states
-
-Custom HTML, CSS, canvas, WebGL, or Three.js is fine for specialized surfaces,
-but the surrounding Quasar controls should still be MudBlazor and should inherit
-Quasar theme tokens.
-
-Do not ship Bootstrap, Tailwind, a second app shell, or a standalone color system
-unless the plugin has a specific technical reason and the review calls it out.
+Custom canvas, WebGL, and Three.js rendering remains appropriate for specialized
+surfaces. Keep surrounding controls compact and consistent with the host.
 
 ## Package Manifest
 
@@ -224,7 +210,7 @@ public sealed class TemplateQuasarPlugin : IQuasarPlugin
         yield return new QuasarNavItem(
             "Template",
             "/template-plugin",
-            Icons.Material.Filled.Extension,
+            TemplateIcons.Extension,
             QuasarNavZones.Main,
             800,
             QuasarPolicyNames.CanView);
