@@ -1,0 +1,26 @@
+<span class="template-plugin-surface">
+    <button type="button" class="template-icon-button" title="@Label" aria-label="@Label"
+            disabled="@(!CanViewEntity)" @onclick="@(() => _shownId = EntityId)">
+        <PluginIcon Icon="@PluginIcons.Extension" />
+    </button>
+    @if (CanViewEntity && _shownId == EntityId)
+    {
+        <span class="template-action-notice" role="status">@Name (@EntityId) on @Server</span>
+    }
+</span>
+
+@code {
+    [Parameter] public string? AgentId { get; set; }
+    [Parameter] public string? ServerName { get; set; }
+    [Parameter] public long EntityId { get; set; }
+    [Parameter] public string? EntityType { get; set; }
+    [Parameter] public string? EntitySubType { get; set; }
+    [Parameter] public string? EntityDisplayName { get; set; }
+    [Parameter] public ulong? OwnerSteamId { get; set; }
+    [Parameter] public bool CanViewEntity { get; set; }
+
+    private long? _shownId;
+    private string Label => CanViewEntity ? "Show entity details" : "Entity is not viewable";
+    private string Name => string.IsNullOrWhiteSpace(EntityDisplayName) ? "Entity" : EntityDisplayName;
+    private string Server => string.IsNullOrWhiteSpace(ServerName) ? AgentId ?? "unknown server" : ServerName;
+}

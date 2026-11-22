@@ -1,0 +1,46 @@
+@page "/template-plugin"
+@attribute [Authorize(Policy = "CanView")]
+@inject IJSRuntime JS
+
+<PageTitle>Template Plugin</PageTitle>
+<section class="template-plugin-surface template-panel">
+    <header class="template-row">
+        <h1>Template Plugin</h1>
+        <button type="button" class="template-button" disabled="@_busy" @onclick="ReadVersionAsync">
+            <PluginIcon Icon="@PluginIcons.Refresh" />Read installed version
+        </button>
+    </header>
+    @if (_error is not null)
+    {
+        <p role="alert">@_error</p>
+    }
+    else if (_version is not null)
+    {
+        <p role="status">Installed version: @_version</p>
+    }
+</section>
+
+@code {
+    private bool _busy;
+    private string? _version;
+    private string? _error;
+
+    private async Task ReadVersionAsync()
+    {
+        if (_busy) return;
+        _busy = true;
+        _error = null;
+        try
+        {
+            _version = await JS.InvokeAsync<string>("quasarSdk.request", "template-plugin", "version.read");
+        }
+        catch (JSException ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+}

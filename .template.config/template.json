@@ -1,15 +1,42 @@
 {
   "$schema": "http://json.schemastore.org/template",
   "author": "CometWorks",
-  "classifications": [
-    "Quasar",
-    "Blazor",
-    "MudBlazor",
-    "Plugin"
-  ],
+  "classifications": ["Quasar", "Blazor", "WebAssembly", "Plugin"],
   "identity": "CometWorks.Quasar.Plugin.Template",
   "name": "Quasar UI Plugin",
   "shortName": "quasar-plugin",
-  "sourceName": "TemplatePlugin",
-  "preferNameDirectory": true
+  "preferNameDirectory": true,
+  "sources": [{
+    "modifiers": [{
+      "exclude": [".git", ".git/**", "plugin-package/**", "tests/generate.py", "**/node_modules/**"]
+    }]
+  }],
+  "guids": ["7f053393-e51f-4c8c-90ad-d32ff8de287c"],
+  "symbols": {
+    "projectName": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "safe_namespace",
+      "replaces": "TemplatePlugin",
+      "fileRename": "TemplatePlugin"
+    },
+    "displayName": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "identity",
+      "replaces": "Template Plugin"
+    },
+    "slug": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "routeName",
+      "replaces": "template-plugin",
+      "fileRename": "template-plugin"
+    }
+  },
+  "forms": {
+    "separateWords": { "identifier": "replace", "pattern": "([a-z0-9])([A-Z])", "replacement": "$1-$2" },
+    "separateParts": { "identifier": "replace", "pattern": "[^A-Za-z0-9]+", "replacement": "-" },
+    "routeName": { "identifier": "chain", "steps": ["separateWords", "separateParts", "lowerCaseInvariant"] }
+  }
 }

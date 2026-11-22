@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <PluginData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="GitHubPlugin">
-    <Id>00000000-0000-0000-0000-000000000000</Id>
+    <Id>7f053393-e51f-4c8c-90ad-d32ff8de287c</Id>
     <RepoId>todo-github-user/template-plugin</RepoId>
     <FriendlyName>Template Plugin</FriendlyName>
     <Author>TODO Author Name</Author>
@@ -9,6 +9,6 @@
     <PluginKind>QuasarUiPlugin</PluginKind>
     <ProjectPath>src/TemplatePlugin.Quasar/TemplatePlugin.Quasar.csproj</ProjectPath>
     <PackageManifest>quasar-plugin.json</PackageManifest>
-    <QuasarVersion>&gt;=1.1.0</QuasarVersion>
+    <QuasarVersion>&gt;=1.7.0</QuasarVersion>
     <Commit>TODO Git commit hash</Commit>
 </PluginData>

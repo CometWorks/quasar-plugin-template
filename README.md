@@ -1,280 +1,108 @@
 # Quasar Plugin Template
 
-Starter repository for Quasar UI plugins.
+Build a Quasar 1.7+ dashboard plugin with .NET 10 and Blazor WebAssembly.
+The starter adds a navigation link, a page that reads its installed version
+through the authorized panel SDK, and an action on each viewable entity row.
+The dashboard runs the same browser components locally and under a hosted panel path.
 
-Quasar UI plugins run inside the Quasar Blazor Server process. They can add
-routes, nav items, extension components, static assets, and generic requests to
-companion Magnetar plugins through Quasar.Agent.
+## Create a plugin
 
-The template also includes a standalone preview host so replacement pages and
-components can be viewed quickly with Quasar appearance tokens.
+From a checkout of this template, run:
 
-The Quasar adapter accepts `QuasarPluginAbstractionsAssembly` when built by the
-QuasarHub installer, so it compiles against the exact
-`Quasar.Plugin.Abstractions.dll` loaded by the running Quasar worker. For local
-development it uses a sibling Quasar checkout when the default
-`QuasarPluginAbstractionsProject` path resolves from `src/TemplatePlugin.Quasar`,
-and falls back to the `Quasar.Plugin.Abstractions` package otherwise. Override
-the MSBuild properties when Quasar lives elsewhere.
-
-## Expected Layout
-
-```text
-.
-|-- quasar-plugin.json
-|-- quasar-hub.xml
-|-- src/
-|   |-- TemplatePlugin/
-|   |   |-- TemplatePlugin.csproj
-|   |   |-- _Imports.razor
-|   |   |-- Pages/
-|   |   |   `-- TemplatePage.razor
-|   |   |-- Components/
-|   |   |   `-- TemplateDashboardPanel.razor
-|   |   `-- wwwroot/
-|   |       `-- template-plugin.css
-|   |-- TemplatePlugin.Quasar/
-|   |   |-- TemplatePlugin.Quasar.csproj
-|   |   `-- TemplateQuasarPlugin.cs
-|   `-- TemplatePlugin.Magnetar/
-|       |-- TemplatePlugin.Magnetar.csproj
-|       `-- TemplateCompanionPlugin.cs
-|-- samples/
-|   `-- PreviewHost/
-|       |-- PreviewHost.csproj
-|       |-- Program.cs
-|       |-- Components/
-|       `-- wwwroot/
-`-- docs/
-    |-- CompanionChannel.md
-    `-- NativeUi.md
+```sh
+dotnet new install .
+dotnet new quasar-plugin -n Acme.FleetTools -o ../FleetTools
 ```
 
-## Preview Workflow
+Use a unique ASCII .NET project name such as `Acme.FleetTools`. The generator
+renames the namespaces, projects, DLLs and stylesheet, derives the package ID
+and page route (`acme-fleet-tools` and `/acme-fleet-tools` in this example),
+and generates a hub GUID. Run subsequent commands from the new project,
+using its generated paths. A GitHub **Use this template** copy retains the
+starter identifiers until you rename them yourself.
 
-Run the standalone preview host while building plugin UI:
+## Build and preview
 
-```bash
-dotnet run --project samples/PreviewHost/PreviewHost.csproj
+Set `QUASAR_PUBLISH` to the Release publish directory of the target worker.
+
+```sh
+dotnet build src/TemplatePlugin.Quasar -c Release \
+  -p:QuasarPluginAbstractionsAssembly="$QUASAR_PUBLISH/Quasar.Plugin.Abstractions.dll"
+dotnet run --project samples/PreviewHost
 ```
 
-The preview host references only the `TemplatePlugin` UI project and the ASP.NET Core framework.
-It does not require `Quasar.Plugin.Abstractions`, so component/page design stays
-fast even when Quasar itself is not running.
+The adapter can also build against a sibling `Quasar` checkout or an explicit
+`-p:QuasarPluginAbstractionsProject=/path/to/Quasar.Plugin.Abstractions.csproj`.
+QuasarHub supplies the running worker's abstractions DLL when it builds a package.
 
-Use the preview host to check:
+The standalone WASM preview shows a grid and a character with different action
+availability, a theme toggle, and the same routable page as the dashboard.
+Its preview-only SDK returns the value `preview`. An installed plugin reads
+the version declared in its package manifest.
 
-- replacement pages
-- dashboard panels
-- entity/server action components
-- plugin singleton/scoped state
-- light and dark appearance behavior
-- responsive layout
+## Package and runtime
 
-The Quasar adapter lives in `src/TemplatePlugin.Quasar`. It is intentionally thin
-and should only translate UI components into Quasar plugin contributions.
+| Location | Responsibility |
+| --- | --- |
+| `src/TemplatePlugin` | Browser Razor class library. Contains the page, typed entity action and static CSS. |
+| `src/TemplatePlugin.Quasar` | Worker adapter. Registers the route assembly, navigation, extension and authorized SDK operation. |
+| `src/TemplatePlugin.Magnetar` | Owned game-server companion for the separate `runtime.info` example. |
+| `quasar-plugin.json` | Runtime package ID, entry type, worker and browser DLL names, SDK version, project and static asset paths. |
+| `quasar-hub.xml` | Source catalog entry with repository, minimum host version and reviewed commit. |
 
-## Native UI
+Building the adapter places `TemplatePlugin.Quasar.dll` and `TemplatePlugin.dll`
+beside one another in `src/TemplatePlugin.Quasar/bin/Release/net10.0/`.
+The manifest's `browserAssembly` is the browser DLL's **basename**. Quasar
+discovers the adapter's build output, resolves `staticAssets` relative to the
+manifest, and shadow-copies the package. To load the build locally, set
+`QUASAR_UI_PLUGIN_DIR` to the absolute plugin repository directory when
+starting a development worker and restart it after changes.
 
-Use semantic HTML controls, Blazor bindings, and scoped CSS with Quasar's
-`--quasar-palette-*` appearance tokens. The template, adapter, and preview host
-have no MudBlazor dependency. Existing Material icons are retained as SVG paths.
-See [Native Quasar UI](docs/NativeUi.md) for forms, dialogs, validation,
-accessibility, theme inheritance, and installed asset paths.
+The adapter returns the component assembly from `GetRazorAssemblies()` and
+registers the entity action through `GetExtensions()`. The worker checks the
+page, navigation and outlet policies. The browser loads the declared assembly
+through its authenticated panel and verifies its digest. Choose a unique route
+for each plugin. The entity outlet passes named component parameters, including
+a 64-bit entity ID and nullable unsigned owner ID. Preserve their types.
 
-Custom canvas, WebGL, and Three.js rendering remains appropriate for specialized
-surfaces. Keep surrounding controls compact and consistent with the host.
+The page invokes `quasarSdk.request` on the dashboard's existing panel client.
+Its `version.read` operation requires `CanView` on the worker, independently
+of the page's `[Authorize]` attribute. Register worker services, persistence,
+secrets and companion access in the adapter. Keep view state inside the
+browser component. Use panel-relative links and assets so navigation works
+under hosted prefixes. [Native UI](docs/NativeUi.md) · [Companion channel](docs/CompanionChannel.md)
 
-## Package Manifest
+## Check the installed plugin
 
-`quasar-plugin.json` describes the runtime plugin package:
+The template checkout includes a generation test in `tests/generate.py`. It
+creates a fresh renamed project and runs its browser check against Quasar's
+published dashboard fixture at both root and a hosted path. Supply the matching
+Quasar 1.7 source checkout, its Release publish output, Python 3, and Node
+with Playwright, Chromium and Firefox installed. The companion and Quasar agent
+builds use the Dedicated Server and Magnetar SDK paths.
 
-```json
-{
-  "id": "todo.template-plugin",
-  "displayName": "Template Plugin",
-  "version": "0.1.0",
-  "entryAssembly": "TemplatePlugin.Quasar.dll",
-  "entryType": "TemplatePlugin.Quasar.TemplateQuasarPlugin",
-  "projectPath": "src/TemplatePlugin.Quasar/TemplatePlugin.Quasar.csproj",
-  "staticAssets": "src/TemplatePlugin/wwwroot",
-  "stylesheets": [
-    "template-plugin.css"
-  ],
-  "quasarVersion": ">=1.1.0",
-  "companionPlugins": [
-    {
-      "id": "todo.template-plugin",
-      "projectPath": "src/TemplatePlugin.Magnetar/TemplatePlugin.Magnetar.csproj",
-      "entryAssembly": "TemplatePlugin.Magnetar.dll"
-    }
-  ]
-}
+```sh
+dotnet publish "$QUASAR_SOURCE/Quasar/Quasar.csproj" -c Release -o "$QUASAR_PUBLISH"
+python3 tests/generate.py "$QUASAR_SOURCE" "$QUASAR_PUBLISH"
 ```
 
-`stylesheets` entries are resolved relative to `staticAssets` and injected into
-Quasar's host page after Quasar core CSS. Keep plugin CSS scoped by class names
-or component selectors so it does not disturb unrelated Quasar pages.
+The generated project retains `tests/dashboard.mjs`. To check a development
+panel directly, pass its full base URL ending in `/` and, for a signed-in
+panel, a local Playwright storage-state file. Keep session files private.
 
-An owned Magnetar companion is declared as an object with `id`, `projectPath`,
-and optional `entryAssembly` fields instead of a string id. During installation,
-Quasar builds that project with `MagnetarProtocolAssembly`, a resolved `DS64`
-directory, and the managed `Magnetar` install root when available. The companion
-uses `$(DS64)` for Dedicated Server assemblies and `$(Magnetar)` for
-`PluginSdk.dll`. Both properties have local-development defaults that apply only
-when Quasar does not supply a path.
-See [Companion Channel](docs/CompanionChannel.md) for an example.
-
-`quasar-hub.xml` is the catalog descriptor copied into
-`CometWorks/quasar-hub/Plugins/` when publishing.
-
-## Project Split
-
-- `TemplatePlugin`
-  - Razor components, pages, static assets, and UI services.
-  - Buildable in the preview host without Quasar.
-- `TemplatePlugin.Quasar`
-  - Thin adapter implementing `IQuasarPlugin`.
-  - Registers nav items, routes, extension points, endpoints, and services.
-  - References `Quasar.Plugin.Abstractions`.
-- `TemplatePlugin.Magnetar`
-  - Owned server companion loaded by Magnetar.
-  - Handles Quasar companion-channel requests through `Magnetar.Protocol`.
-  - References Space Engineers server assemblies through `$(DS64)`.
-  - References the host-provided `PluginSdk.dll` through `$(Magnetar)`.
-
-Keep most UI code in the UI project. Keep Quasar-specific code in the adapter
-and server-only code in the Magnetar companion.
-
-## Dependency Injection and State
-
-Put plugin services in the UI project and expose one registration method:
-
-```csharp
-public static IServiceCollection AddTemplatePluginUi(this IServiceCollection services)
-{
-    services.AddSingleton<TemplatePluginState>();
-    return services;
-}
+```sh
+QUASAR_TEST_PANEL_URL="$PANEL_BASE_URL" QUASAR_TEST_STORAGE_STATE="$SESSION_FILE" \
+  node tests/dashboard.mjs
 ```
 
-Both hosts call this same method:
+For the generation test, set `PLAYWRIGHT_MODULE` to an absolute Playwright
+module entry point accessible to the Quasar fixture. The standalone check can
+also use a project-local installation of `playwright`. `CHROME_PATH`
+can select a locally installed Chromium executable.
 
-- `samples/PreviewHost/Program.cs`
-- `src/TemplatePlugin.Quasar/TemplateQuasarPlugin.cs`
+## Publish to QuasarHub
 
-Use this pattern for:
-
-- singleton plugin state
-- scoped UI state
-- typed clients
-- companion-channel wrappers
-- background services when they are bounded and cancellable
-
-Avoid replacing Quasar core services unless Quasar exposes an explicit extension
-target for that service.
-
-Use `context.InstallDirectory` when the adapter needs Quasar-owned persistent
-files, for example under `ManagedRuntime/Tools/<plugin-id>`. Do not read
-`QUASAR_INSTALL_DIR` directly in plugin code; Quasar has already resolved the
-environment variable, `QUASAR_INSTALL_DIR_FILE`, and development
-`.quasar-install-dir` overrides before it builds the plugin context.
-`context.PluginDirectory` is the package manifest directory, and
-`context.CacheDirectory` is the shadow-copy load directory.
-
-## Plugin Entry Point
-
-The entry point implements `IQuasarPlugin`:
-
-```csharp
-public sealed class TemplateQuasarPlugin : IQuasarPlugin
-{
-    public string Id => "todo.template-plugin";
-    public string DisplayName => "Template Plugin";
-
-    public void ConfigureServices(IServiceCollection services, QuasarPluginContext context)
-    {
-    }
-
-    public void ConfigureEndpoints(IEndpointRouteBuilder endpoints, QuasarPluginContext context)
-    {
-    }
-
-    public IEnumerable<Assembly> GetRazorAssemblies()
-    {
-        yield return typeof(TemplateDashboardPanel).Assembly;
-    }
-
-    public IEnumerable<QuasarNavItem> GetNavItems()
-    {
-        yield return new QuasarNavItem(
-            "Template",
-            "/template-plugin",
-            TemplateIcons.Extension,
-            QuasarNavZones.Main,
-            800,
-            QuasarPolicyNames.CanView);
-    }
-
-    public IEnumerable<QuasarExtensionContribution> GetExtensions()
-    {
-        yield return new QuasarExtensionContribution(
-            QuasarExtensionTargets.EntityActions,
-            typeof(TemplateEntityAction),
-            QuasarPatchMode.After,
-            800,
-            Id,
-            QuasarPolicyNames.CanView);
-    }
-}
-```
-
-## Extension Points
-
-Quasar plugins can contribute to stable extension targets. Currently hosted in
-Quasar:
-
-- `quasar.component.entity-actions`
-- `quasar.page.entities`
-
-Planned targets:
-
-- `quasar.dashboard.panels`
-- `quasar.component.entity-details-tabs`
-- `quasar.component.server-detail-actions`
-- `quasar.page.plugins`
-- `quasar.page.analytics`
-
-Use replacement carefully. Page/component replacement is powerful and should be
-visible in the plugin manifest/review.
-
-## Companion Channel
-
-Use the companion channel when a UI plugin needs data from a Magnetar plugin
-loaded into a managed Dedicated Server.
-
-The UI plugin sends:
-
-- target server id
-- companion plugin id
-- operation name
-- JSON payload
-
-The companion plugin replies with JSON payload. Keep operations versioned and
-bounded.
-
-Example operation names:
-
-- `grid.audit.get`
-- `grid.backups.list`
-- `grid.snapshot.metadata`
-
-## Publishing
-
-1. Replace template ids, names, namespaces, and project paths.
-2. Pin package versions.
-3. Build and test the plugin against a compatible Quasar build.
-4. Commit the plugin repository.
-5. Copy `quasar-hub.xml` to `quasar-hub/Plugins/<PluginName>.xml`.
-6. Set `Commit` to the exact plugin repository commit.
-7. Open a QuasarHub pull request.
+Set the repository owner, author, description and commit in the hub XML.
+Keep the package and hub version requirements aligned. Build the optional
+companion if you ship one, verify the generated package on your target
+dashboard, then submit the catalog XML with the exact reviewed plugin commit.

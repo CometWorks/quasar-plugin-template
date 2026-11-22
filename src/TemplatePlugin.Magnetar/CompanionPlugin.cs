@@ -8,11 +8,11 @@ using VRage.Plugins;
 
 namespace TemplatePlugin.Magnetar
 {
-    public sealed class TemplateCompanionPlugin : IPlugin, IQuasarCompanionRequestHandler
+    public sealed class CompanionPlugin : IPlugin, IQuasarCompanionRequestHandler
     {
         private const string RuntimeInfoOperation = "runtime.info";
 
-        public string PluginId => "todo.template-plugin";
+        public string PluginId => "template-plugin";
 
         public void Init(object gameServer)
         {
