@@ -32,15 +32,17 @@ sample light/dark palettes; production styling comes from the host.
 
 Declare plugin stylesheets in `quasar-plugin.json` relative to `staticAssets`.
 Quasar injects them after core CSS. Scope selectors to your plugin to avoid
-changing other pages. Installed plugin assets use `/_quasar/plugins/<id>/`;
-`/_content/<assembly>/` is the Razor class library path used by the preview host.
+changing other pages. Resolve installed assets from the panel's base URI, for
+example `_quasar/plugins/<id>/image.png`. At a hosted panel this includes its
+path prefix. The standalone WASM preview serves library assets under
+`_content/<assembly>/`.
 
 ## Controls and behavior
 
 - Use `<button type="button">` for actions, `<a>`/`NavLink` for navigation,
   and `<form>` with a submit button for keyboard-friendly form submission.
 - Label inputs and icon buttons. Retain existing SVG paths where possible; the
-  template's `TemplateIcons` and `TemplateIcon` reuse the original Material
+  template's `PluginIcons` and `PluginIcon` reuse the original Material
   icons and include their Apache license.
 - Use native `<details>`, `<progress>`, and `<table>` where appropriate. Keep
   wide tables inside a scrolling container and use column/row header semantics.
@@ -53,7 +55,9 @@ changing other pages. Installed plugin assets use `/_quasar/plugins/<id>/`;
 - Show asynchronous errors and success messages with `role="alert"` or
   `role="status"`. Dispose event subscriptions, timers, and JS interop references.
 
-Build both the preview host and Quasar adapter. Check light/dark modes, custom
-branding, keyboard navigation, and narrow layouts before publishing a pinned
-plugin revision. Existing Mud-dependent plugins still need their own migration
-before Quasar can remove the compatibility providers and assets.
+Publish the preview and exercise the installed plugin in a Release build of
+Quasar. A preview references components at build time. Quasar loads their DLL
+after publication. If the dashboard uses trimming, verify that it retains the
+framework members your components call. The generated browser test checks the actual
+package, hosted asset paths and SDK call. Also check light/dark modes, keyboard
+navigation and narrow layouts when you change the controls.

@@ -4,40 +4,47 @@ using Microsoft.Extensions.DependencyInjection;
 using Quasar.Plugin.Abstractions;
 using Quasar.Plugin.Abstractions.Extensions;
 using Quasar.Plugin.Abstractions.Navigation;
+using Quasar.Plugin.Abstractions.Operations;
 using Quasar.Plugin.Abstractions.Security;
 using TemplatePlugin.Components;
-using TemplatePlugin.Services;
 
 namespace TemplatePlugin.Quasar;
 
-public sealed class TemplateQuasarPlugin : IQuasarPlugin
+public sealed class PluginAdapter : IQuasarPlugin
 {
-    public string Id => "todo.template-plugin";
+    public sealed record VersionRequest;
+
+    public string Id => "template-plugin";
 
     public string DisplayName => "Template Plugin";
 
     public void ConfigureServices(IServiceCollection services, QuasarPluginContext context)
     {
-        // Use context.InstallDirectory for Quasar-owned persistent files.
-        services.AddTemplatePluginUi();
+        services.AddQuasarOperation<VersionRequest, string>(
+            context.PluginId, "version.read", [QuasarPolicyNames.CanView],
+            (_, _, _) => Task.FromResult(context.Manifest.Version),
+            new QuasarOperationMetadata
+            {
+                Effect = QuasarOperationEffect.Read,
+                Description = "Returns the installed UI package version."
+            });
     }
 
     public void ConfigureEndpoints(IEndpointRouteBuilder endpoints, QuasarPluginContext context)
     {
-        // Map plugin-specific minimal APIs here if the UI needs Quasar-hosted endpoints.
     }
 
     public IEnumerable<Assembly> GetRazorAssemblies()
     {
-        yield return typeof(TemplateDashboardPanel).Assembly;
+        yield return typeof(EntityAction).Assembly;
     }
 
     public IEnumerable<QuasarNavItem> GetNavItems()
     {
         yield return new QuasarNavItem(
-            "Template",
+            DisplayName,
             "/template-plugin",
-            TemplateIcons.Extension,
+            PluginIcons.Extension,
             QuasarNavZones.Main,
             800,
             QuasarPolicyNames.CanView);
@@ -47,7 +54,7 @@ public sealed class TemplateQuasarPlugin : IQuasarPlugin
     {
         yield return new QuasarExtensionContribution(
             QuasarExtensionTargets.EntityActions,
-            typeof(TemplateEntityAction),
+            typeof(EntityAction),
             QuasarPatchMode.After,
             800,
             Id,
