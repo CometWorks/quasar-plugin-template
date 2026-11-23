@@ -72,6 +72,31 @@ secrets and companion access in the adapter. Keep view state inside the
 browser component. Use panel-relative links and assets so navigation works
 under hosted prefixes. [Native UI](docs/NativeUi.md) · [Companion channel](docs/CompanionChannel.md)
 
+## Optional Discord commands and interactions
+
+When targeting a Quasar worker that includes `IQuasarDiscordCommand`, add your
+Discord handlers to `src/TemplatePlugin.Quasar`, the worker adapter. Add a
+`Discord.Net.Core` package reference there that matches the target worker
+(`3.16.0` for the initial Discord interaction SDK). Register each implementation
+as a singleton in `PluginAdapter.ConfigureServices`.
+
+```csharp
+services.AddSingleton<IQuasarDiscordCommand, FleetStatusCommand>();
+services.AddSingleton<IQuasarDiscordInteractionHandler, FleetInteractionHandler>();
+```
+
+Both interfaces are in `Quasar.Plugin.Abstractions.Discord`. A command builds
+a Discord.Net slash, user or message command definition. An interaction
+handler receives button clicks, select menu choices and modal submissions
+whose custom IDs start with its prefix. Use your plugin ID as the prefix, for
+example `acme-fleet-tools:refresh`.
+
+Quasar registers your commands with its bot in the configured guild when the
+bot connects. Your handlers validate the caller's permissions and acknowledge
+each interaction. Build against the SDK of your target worker and set
+`QuasarVersion` in `quasar-hub.xml` to require a release that provides these
+contracts. [Discord SDK guide and working example](https://github.com/CometWorks/quasar/blob/main/Docs/QuasarPluginSystem.md#discord-commands-and-interactions)
+
 ## Check the installed plugin
 
 The template checkout includes a generation test in `tests/generate.py`. It
